@@ -1,15 +1,17 @@
 module.exports = {
-    name: 'list',
+    name: 'list-data',
     data() {
         return {
             batch_flag: true, //符合批量删除为true,否则为false
             batch_datas: [],
             batch_ids: [],
 
-            list: this.List || [], //列表数组
-            fields: this.FieldList || [], //字段数组
-            selection: this.Selection || false, //是否需要批量选择
-            btn_info: this.BtnInfo || {}
+            list: this.List, //列表数组
+            fields: this.FieldList, //字段数组
+            selection: this.Selection, //是否需要批量选择
+            btn_info: this.BtnInfo,
+
+            pagination: this.Pagination,
         }
     },
     methods: {
@@ -46,9 +48,8 @@ module.exports = {
          * 删除事件
          * @param  {object || boolean} user  当前信息对象或者为布尔值,为布尔值时，代表是批量删除
          * @param  {number} index 当前列表索引
-         * @param  {array} list  当前列表数组
          */
-        onDelete(data, index, list) {
+        onDelete(data, index) {
             var opts = {};
             if (data === true) {
                 opts.batch_ids = this.batch_ids;
@@ -56,7 +57,6 @@ module.exports = {
             } else {
                 opts.data = data;
                 opts.index = index;
-                opts.list = list;
             }
 
             /**
@@ -88,6 +88,35 @@ module.exports = {
             });
         },
 
+
+        onUpdateBtn(data, index, list) {
+            if (this.btn_info.update && this.btn_info.update.path) {
+                var path = this.btn_info.update.path,
+                    param_keys = this.btn_info.update.param_keys || [],
+                    query_keys = this.btn_info.update.query_keys || [],
+                    query = {};
+
+                for (var i = 0; i < param_keys.length; i++) {
+                    path += '/' + data[param_keys[i]];
+                }
+                for (var i = 0; i < query_keys.length; i++) {
+                    query[query_keys[i]] = data[query_keys[i]];
+                }
+
+                // console.log(path);
+                // console.log(query);
+
+                this.$router.push({
+                    path: path,
+                    query: query
+                });
+            } else {
+                this.onGetInfo(data, index, list, 'update');
+            }
+
+        },
+
+
         /**
          * 内置删除事件执行成功后，更新列表方法
          * 分两种情况，一种是批量删除，一种是单个删除
@@ -104,10 +133,19 @@ module.exports = {
                     return row.indexOf(item.id) === -1;
                 });
             }
+        },
+
+        onChangeCurrentPage(page) {
+            this.$emit('onChangeCurrentPage', page);
+        },
+        onChangePageSize(page_size) {
+            this.$emit('onChangePageSize', page_size);
         }
     },
 
-    mounted() {},
+    mounted() {
+        // console.log(this.list);
+    },
 
     /**
      * 接收参数
@@ -123,11 +161,16 @@ module.exports = {
             required: true
         },
         BtnInfo: {
-            type: Object
+            type: Object,
+            default: {}
         },
         Selection: {
             type: Boolean,
             default: false
+        },
+        Pagination: {
+            type: Object,
+            default: {}
         }
     },
 
@@ -153,5 +196,8 @@ module.exports = {
         BtnInfo(v) {
             this.btn_info = v;
         },
+        Pagination(v) {
+            this.pagination = v;
+        }
     }
 }

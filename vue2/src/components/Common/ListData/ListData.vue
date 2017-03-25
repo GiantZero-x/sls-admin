@@ -45,13 +45,13 @@
                         type="info" 
                         icon='edit' 
                         size="mini"
-                        @click='onGetInfo(scope.row,scope.$index,list,"update")'></el-button>
+                        @click='onUpdateBtn(scope.row,scope.$index,list)'></el-button>
                     <el-button
                         v-if='btn_info.delete!==false'
                         type="danger" 
                         icon='delete' 
                         size="mini"
-                        @click='onDelete(scope.row,scope.$index,list)'></el-button>
+                        @click='onDelete(scope.row,scope.$index)'></el-button>
 
 
                     <el-button
@@ -63,6 +63,22 @@
                 </template>
             </el-table-column>
         </el-table>
+        <el-col :span="24" class='btm-action'>
+            <!-- 
+     
+             -->
+            <el-pagination
+                v-if='pagination.total>0'
+                class='pagination'
+                :page-sizes="pagination.page_sizes"
+                :page-size="pagination.page_size"
+                :layout="pagination.layout"
+                :total="pagination.total"
+                :current-page='pagination.current_page'
+                @current-change='onChangeCurrentPage'
+                @size-change='onChangePageSize'>
+            </el-pagination>
+        </el-col>
     </div>
 </template>
 

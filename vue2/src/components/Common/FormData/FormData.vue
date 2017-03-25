@@ -1,20 +1,54 @@
 <template>
     <div class="form">
-        <el-form style="margin:20px;width:60%;min-width:600px;" 
+        <el-form style="" 
             label-width="100px" 
-            ref='user_data'>
-            <el-form-item class='edit-form'
+            ref='form-data'
+            :rules='rules'
+            :model='submit_data'>
+            <el-form-item 
+                class='edit-form'
                 v-for='field in fields'
                 :label="field.label" 
-                :prop='field.key'>
+                :prop='field.key'
+                :style="field.item_style">
                 
+                <!-- 单选CheckBox -->
+                <el-checkbox 
+                    v-if='field.type==="checkbox" && field.multiple!==true'
+                    v-model="submit_data[field.key]">{{field.label}}</el-checkbox>
+
+                
+                <!-- 复选CheckBox -->
+                <!-- 是否全选全不选 -->
+                <el-checkbox
+                    v-if='field.checkall && typeof field.checkall==="object" && submit_data[field.key+checkall_temp]'
+                    :indeterminate="submit_data[field.key+checkall_temp].indeterminate" 
+                    v-model="submit_data[field.key+checkall_temp].value"
+                    @change='onCheckallChange(field.key)'>{{submit_data[field.key+checkall_temp].text}}</el-checkbox>
+                <!-- CheckBox选项列表 -->
+                <el-checkbox-group 
+                    v-if='(field.type==="checkbox" && field.multiple===true && !field.checkall) || (field.type==="checkbox" && field.multiple===true && field.checkall && submit_data[field.key+checkall_temp])'
+                    v-model="submit_data[field.key+checkall_temp].checkbox_value"
+                    @change='onCheckboxChange(field.key)'>
+                        <el-checkbox
+                            v-for='item in submit_data[field.key+checkall_temp].checkbox_list'
+                            :label="item.value">{{item.text}}</el-checkbox>
+                </el-checkbox-group>
+
+                <!-- wangeditor -->
+                <div
+                    v-if='field.type==="editor"'
+                    :id="field.id" 
+                    :style="field.style"
+                    v-html='submit_data[field.key]'></div>
+
                 <!--
                     input,textarea 
                  -->
                 <el-input
                     v-if='!field.type || field.type==="input" || field.type==="textarea"'
                     :type='!field.type ? "input" : field.type'
-                    v-model="field.value" 
+                    v-model="submit_data[field.key]" 
                     :placeholder='field.desc'></el-input>
                 
                 <!-- 
@@ -22,7 +56,7 @@
                  -->
                 <el-radio-group 
                     v-if='field.type==="radio"'
-                    v-model="field.value.default">
+                    v-model="submit_data[field.key]">
                     <el-radio
                         v-for='item in field.value.list'
                         :label="item.value">{{item.text || item.value}}</el-radio>
@@ -30,8 +64,8 @@
 
                 <!-- select,下拉框 -->
                 <el-select
-                    v-if='field.type==="select"'
-                    v-model="field.value.default" 
+                    v-if='field.type==="select" && submit_data[field.key]'
+                    v-model="submit_data[field.key]" 
                     :multiple='field.multiple ? true : false' 
                     :placeholder="field.desc">
                     <el-option
@@ -48,12 +82,11 @@
                     :on-text="field.value.on" 
                     :off-text="field.value.off" 
                     :disabled='field.disabled'
-                    v-model="field.value.default"></el-switch>
-
+                    v-model="submit_data[field.key]"></el-switch>
             </el-form-item>
 
             <el-form-item>
-                <el-button type="primary" @click='onSubmit'>提交</el-button>
+                <el-button type="primary" @click='onSubmit("form-data")'>提交</el-button>
             </el-form-item>
         </el-form>
     </div>

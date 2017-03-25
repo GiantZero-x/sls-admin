@@ -6,6 +6,8 @@ import {
     Modules
 } from '../components/';
 
+console.log(Modules);
+
 module.exports = [{
     path: '/',
     redirect: to => {
@@ -182,11 +184,11 @@ module.exports = [{
         hidden: true,
         path: '',
         redirect: to => {
-            return 'user'
+            return 'article'
         }
     }, {
-        path: 'user',
-        name: '用户管理',
+        path: 'components',
+        name: '高级示例',
         icon: 'inbox',
         component: Content,
         children: [{
@@ -197,14 +199,58 @@ module.exports = [{
             }
         }, {
             path: 'list',
-            name: '用户列表',
+            name: '列表组件',
             icon: 'reorder',
-            component: Modules.Adv.User.List
+            component: Modules.Adv.Components.List
         }, {
             path: 'edit',
-            name: '编辑用户',
+            name: '表单组件',
             icon: 'edit',
-            component: Modules.Adv.User.Edit
+            component: Modules.Adv.Components.Edit
+        }]
+    }, {
+        path: 'article',
+        name: '文章管理',
+        icon: 'inbox',
+        component: Content,
+        children: [{
+            hidden: true,
+            path: '',
+            redirect: to => {
+                return 'list'
+            }
+        }, {
+            path: 'list',
+            name: '文章列表',
+            icon: 'reorder',
+            component: Modules.Adv.Article.List
+        }, {
+            path: 'edit',
+            name: '编辑文章',
+            icon: 'edit',
+            component: Modules.Adv.Article.Edit
+        }]
+    }, {
+        path: 'wangeditor',
+        name: 'wangeditor富文本',
+        icon: 'inbox',
+        component: Content,
+        children: [{
+            hidden: true,
+            path: '',
+            redirect: to => {
+                return 'one'
+            }
+        }, {
+            path: 'one',
+            name: '单个',
+            icon: 'reorder',
+            component: Modules.Adv.Wangeditor.One
+        }, {
+            path: 'many',
+            name: '多个',
+            icon: 'edit',
+            component: Modules.Adv.Wangeditor.Many
         }]
     }]
 }];
